@@ -1,0 +1,6 @@
+2026-09-22T22:49:44Z Railway metrics per service since 10m; rates verified 2026-09-01: RAM $10.01/GB-mo, CPU $20.01/vCPU-mo
+  Browser              avg= 165.229 MB  0.000214 vCPU  peak= 175.003 MB  0.002574 vCPU  estimate=$1.62/mo avg ($1.76 peak)
+  OpenMuse             avg= 125.489 MB  0.001439 vCPU  peak= 195.165 MB  0.006686 vCPU  estimate=$1.26/mo avg ($2.04 peak)
+  Postgres             avg=  61.537 MB  0.001095 vCPU  peak=  64.781 MB  0.001583 vCPU  estimate=$0.62/mo avg ($0.66 peak)
+  TOTAL avg=352.255MB 0.002748vCPU peak=434.949MB 0.010843vCPU estimate=$3.50/mo avg ($4.47 peak)
+RESULT footprint PASS services=3 avg_mb=352.255 peak_mb=434.949 avg_vcpu=0.002748 peak_vcpu=0.010843 monthly_usd=3.50

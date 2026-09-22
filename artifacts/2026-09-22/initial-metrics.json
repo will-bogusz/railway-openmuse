@@ -1,0 +1,46 @@
+{
+  "day": "2026-09-22",
+  "ts": "2026-09-22T22:43:03Z",
+  "owner": {
+    "activeDeployments": 1,
+    "deploymentsLast90Days": 1,
+    "earningsLast30Days": 0,
+    "eligibleForSupportBonus": true,
+    "supportHealth": 100,
+    "templateHealth": 100,
+    "totalDeployments": 1,
+    "totalEarnings": 0
+  },
+  "public": {
+    "projects": 0,
+    "activeProjects": 0,
+    "recentProjects": 0,
+    "health": null,
+    "isVerified": false,
+    "isApproved": false
+  },
+  "search": {
+    "openmuse": {
+      "ours_pos": 1,
+      "board": [
+        {
+          "pos": 1,
+          "code": "openmuse",
+          "health": null,
+          "active": 0
+        }
+      ]
+    },
+    "open muse": {
+      "ours_pos": 1,
+      "board": [
+        {
+          "pos": 1,
+          "code": "openmuse",
+          "health": null,
+          "active": 0
+        }
+      ]
+    }
+  }
+}

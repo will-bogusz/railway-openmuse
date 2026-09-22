@@ -1,0 +1,52 @@
+{
+  "date": "2026-09-22",
+  "template": "W2X5v4",
+  "project": "c8b2561b-b226-4781-9e73-460c892da9b1",
+  "healthInitial": {
+    "ok": true,
+    "mode": "live",
+    "agentConfigured": false,
+    "browserConfigured": true
+  },
+  "auth": {
+    "unauthenticated": 401,
+    "wrongKey": 401,
+    "correctKey": 200
+  },
+  "generatedSecrets": {
+    "encryptionBytes": 32,
+    "accessKeyLength": 32,
+    "workerTokenLength": 48
+  },
+  "realModel": {
+    "model": "openai/openai/gpt-4o-mini",
+    "provider": "OpenRouter Responses",
+    "chat": "42",
+    "browserTitle": "Example Domain",
+    "backgroundTask": {
+      "initial": "waiting_input",
+      "afterContinuation": "succeeded",
+      "result": "The page title is Example Domain."
+    }
+  },
+  "persistence": {
+    "fileSha256": "0e862a72bbc321cb5d76c4ac9f8ac1aa9d3c64efb32b9dbf61b56010840434a8",
+    "fileBytes": 7647,
+    "fileUnchanged": true,
+    "goalPresent": true,
+    "taskStatus": "succeeded",
+    "browserProfileReopen": 200,
+    "browserTitle": "Example Domain",
+    "oldSessionTokenValid": true
+  },
+  "phone": {
+    "width": 390,
+    "scrollWidth": 390
+  },
+  "cutover": {
+    "health200": 65,
+    "total": 66,
+    "timeoutCount": 1,
+    "result": "interruption observed"
+  }
+}

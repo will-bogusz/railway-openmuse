@@ -2,7 +2,7 @@
 
 Container images for [OpenMuse](https://github.com/CopilotKit/OpenMuse) (MIT), built from a pinned
 upstream commit with the application source unchanged. They back the Railway template
-**OpenMuse** and run on any container host.
+**[OpenMuse](https://railway.com/deploy/openmuse?referralCode=MYUCwz)** and run on any container host.
 
 | image | built from | contents |
 |---|---|---|
@@ -11,6 +11,21 @@ upstream commit with the application source unchanged. They back the Railway tem
 
 Upstream publishes no images and has no Dockerfile for the API or the web client; these fill that
 gap until it does.
+
+## Deploy on Railway
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/openmuse?referralCode=MYUCwz)
+
+The template deploys OpenMuse, a private browser worker and PostgreSQL. Supply your own
+`CPK_INTELLIGENCE_API_KEY`, then log in with the generated `OPENMUSE_ACCESS_KEY` from Railway's
+Variables tab. Configure `MODEL` and its provider key for chat and open-ended tasks.
+
+[Setup and limitations](template/README.md) · [Exact template config](template/serializedConfig.json)
+· [Deployment evidence](artifacts/2026-09-22/REPORT.md).
+
+This is upstream alpha software. Browser automation is included; the Docker-based Linux
+desktop/terminal is not. Conversations depend on CopilotKit Intelligence. The template is
+single-workspace, protected by a generated key, not multi-tenant.
 
 ## `openmuse` runtime contract
 

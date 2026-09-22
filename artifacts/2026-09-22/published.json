@@ -1,0 +1,244 @@
+{
+  "id": "bfe67c31-595a-4a32-9cce-88ab91344d80",
+  "code": "openmuse",
+  "name": "OpenMuse",
+  "status": "PUBLISHED",
+  "category": "AI/ML",
+  "image": "https://bogusz.co/external/openmuse-icon.png",
+  "description": "OpenMuse personal AI assistant with browser, tasks, goals and Postgres",
+  "readme": "# Deploy and Host OpenMuse with Railway\n\nOpenMuse is CopilotKit's open-source personal assistant: chat, a persistent browser, delegated tasks, goals, ideas and document workflows in a mobile-friendly web app. This template deploys the web app and API, a private Chromium browser worker, and PostgreSQL. Workspace data, documents and browser profiles survive redeploys. **One input is required:** your CopilotKit Intelligence project key. The workspace login key, encryption key, browser token and database password are generated for you.\n\n**This is an alpha for self-hosters and tinkerers, not a managed assistant.** Bring your own model provider, review agent actions, and expect upstream behavior to change. The optional Docker-based Linux desktop/terminal is not included; Railway cannot provide the Docker engine it needs. Browser automation works without it.\n\n## About Hosting OpenMuse\n\nThree services make up this deployment:\n\n| Service | Purpose | Persistent storage |\n|---|---|---|\n| OpenMuse | Web client, API, task worker and Caddy, on one public HTTPS origin | `/data`: documents and the session-signing key |\n| Browser | Private Playwright Chromium worker, authenticated with a generated token | `/data`: browser profiles |\n| Postgres | Workspace records, tasks, goals, approvals and encrypted connector credentials | `/var/lib/postgresql/data` |\n\nConversations use **CopilotKit Intelligence**, a separate hosted dependency. This is not a completely offline or entirely self-contained deployment. Create a free Developer project at [CopilotKit Intelligence](https://platform.copilotkit.ai), or run `npx copilotkit@latest login` followed by `npx copilotkit@latest project select`. Put its server-only key in `CPK_INTELLIGENCE_API_KEY`. CopilotKit plan limits and retention apply; model-provider usage is separate.\n\nThe API and browser worker drop root privileges before running. Only OpenMuse has a public domain. PostgreSQL and the browser communicate over Railway's private network.\n\n## Common Use Cases\n\n- Chat with your own model and ask it to read or summarize public webpages.\n- Delegate research and document work, then review saved results and source evidence.\n- Keep track of goals, tasks and recurring website checks.\n- Connect Gmail and Google Calendar using your own Google OAuth application.\n- Use an external raw AG-UI agent for conversational routing instead of the built-in model.\n\n## Dependencies for OpenMuse Hosting\n\n- OpenMuse source at commit `fed01e9d6411ab773d9adf1aa490a07dc8c64d0b` (MIT).\n- `ghcr.io/will-bogusz/openmuse:fed01e9-20260922`, pinned by digest: API, web client and Caddy.\n- `ghcr.io/will-bogusz/openmuse-browser-worker:fed01e9-20260922`, pinned by digest: upstream browser-worker Dockerfile, unchanged.\n- Railway's PostgreSQL 18 image and three persistent volumes.\n- Your own CopilotKit Intelligence project key; a model and provider key for general-purpose AI work.\n\nThese are community-maintained images, not official CopilotKit images. [Build source and provenance](https://github.com/will-bogusz/railway-openmuse) are public; the OpenMuse application source is built unchanged.\n\n### Deployment Dependencies\n\n- [OpenMuse source and documentation](https://github.com/CopilotKit/OpenMuse)\n- [Connect a runtime to CopilotKit Intelligence](https://docs.copilotkit.ai/intelligence/connect-your-runtime)\n- [Railway persistent volumes](https://docs.railway.com/volumes)\n- [Railway private networking](https://docs.railway.com/networking/private-networking)\n\n### Implementation Details\n\n**First login.** Wait for all three services to deploy, then open OpenMuse's public domain. Copy `OPENMUSE_ACCESS_KEY` from the OpenMuse service's Variables tab into the sign-in screen. Anyone with this key shares the same workspace; this is not a multi-tenant service. Do not put the key in a URL or share it publicly.\n\n**Configure a model.** The workspace can boot without one, but model chat and open-ended tasks need a provider. In OpenMuse's Variables, set `MODEL` to the provider/model identifier and set the matching key, then deploy the changes:\n\n| Provider | `MODEL` format | Key |\n|---|---|---|\n| OpenAI | `openai/YOUR-MODEL-ID` | `OPENAI_API_KEY` |\n| Anthropic | `anthropic/YOUR-MODEL-ID` | `ANTHROPIC_API_KEY` |\n| Google | `google/YOUR-MODEL-ID` | `GOOGLE_API_KEY` |\n| OpenAI-compatible Responses API | `openai/YOUR-PROVIDER-MODEL-ID` | `OPENAI_API_KEY` plus `OPENAI_BASE_URL` |\n\nFor example, OpenRouter was exercised with `MODEL=openai/openai/gpt-4o-mini` and `OPENAI_BASE_URL=https://openrouter.ai/api/v1`. An endpoint offering only Chat Completions is not sufficient: the built-in OpenAI provider uses the Responses API. No provider key or paid model is bundled.\n\n**Bring your own harness.** Set `AGENT_BACKEND=agui`, `AGENT_URL` to your raw AG-UI run endpoint, and optionally `AGENT_TOKEN`. This replaces conversational routing only. Built-in delegated model tasks still need `MODEL` and its provider key. OpenBot's Intelligence runtime is not a raw AG-UI URL.\n\n**Google connector.** Enable Gmail API and Google Calendar API in your Google Cloud project. Create an OAuth web application, configure its consent screen and test users as appropriate, and add `https://YOUR-OPENMUSE-DOMAIN/api/google/callback` as an authorized redirect URI. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`, redeploy, then connect Google from Apps. Initial consent requests Gmail read-only and Calendar event/calendar-list read-only access. Sending mail or creating events needs additional scopes and a separate action approval. A Google application in Testing can require periodic reconnection. Google OAuth was not connected to a personal account during template QA.\n\n**Persistence and backups.** Keep `TOKEN_ENCRYPTION_KEY` unchanged and backed up with PostgreSQL; rotating it makes stored connector credentials unreadable. Keep the OpenMuse volume for documents and session signing, and the Browser volume for profiles. Back up all three volumes before upgrading. CopilotKit conversation retention is independent of these backups. Deleting a service or its volume is not the same as redeploying it.\n\n**Health and redeploys.** `/api/health` is an unauthenticated, inexpensive process/configuration check, not a model, browser or database round-trip. The private browser uses `/health`. Volume-attached services cannot overlap their old and new deployments, so expect a short interruption during redeploys. Do not treat a green healthcheck as proof that a connector or model provider is configured.\n\n**Alpha limitations.** A delegated model task can stop in Waiting input without calling its completion tool. Read its timeline and provide a continuation if appropriate; a queued task is not proof of completion. General chat, real browser reads and a continued task producing a sourced report were exercised. Connected-account actions, external harnesses and the Docker computer were not exercised. Browser automation may encounter captchas or site restrictions; complete those yourself rather than trying to bypass them.\n\n**Upgrades.** Images are immutable digest pins, not automatic updates. Review upstream changes, build and test a new pinned commit, then update both image references. See the image repository for the build workflow. Your existing deployment does not automatically inherit marketplace-template edits.\n\n**Risks.** Models can act on untrusted webpages and documents. Give the workspace only the access it needs, inspect proposed external actions, and keep the login key private. Browser profiles can contain signed-in sessions. Provider charges, CopilotKit terms, site terms and Railway's fair-use policy apply. Alpha software and pinned images require active maintenance and backups.\n\n### Why Deploy OpenMuse on Railway?\n\nRailway hosts the application, private browser and database together, wires their private-network connections, provides an HTTPS domain and keeps persistent volumes across redeploys. You supply your own service credentials and retain control of the application configuration.\n",
+  "serializedConfig": {
+    "buckets": {},
+    "services": {
+      "83577d9d-cc86-4593-a270-210beed2dd43": {
+        "icon": "https://bogusz.co/external/openmuse-icon.png",
+        "name": "OpenMuse",
+        "deploy": {
+          "startCommand": null,
+          "healthcheckPath": "/api/health",
+          "restartPolicyType": "ON_FAILURE",
+          "restartPolicyMaxRetries": 10
+        },
+        "source": {
+          "image": "ghcr.io/will-bogusz/openmuse:fed01e9-20260922@sha256:67063ca1a871c563332525699e9da80618e7acbe00de35a0bf755bdd0d3a6a73"
+        },
+        "variables": {
+          "PORT": {
+            "description": "Public web and API proxy port.",
+            "defaultValue": "8080"
+          },
+          "MODEL": {
+            "isOptional": true,
+            "description": "Optional model, e.g. openai/gpt-5.6-terra, anthropic/claude-sonnet-4-6 or google/gemini-2.5-flash. Set the matching provider key. Blank starts the workspace without model chat.",
+            "defaultValue": ""
+          },
+          "DATA_DIR": {
+            "description": "Persistent documents and workspace signing key. Do not change without migrating the volume.",
+            "defaultValue": "/data"
+          },
+          "AGENT_URL": {
+            "isOptional": true,
+            "description": "Optional remote AG-UI agent endpoint. Set AGENT_BACKEND=agui to use your own harness.",
+            "defaultValue": ""
+          },
+          "AGENT_TOKEN": {
+            "isOptional": true,
+            "description": "Optional bearer token for AGENT_URL.",
+            "defaultValue": ""
+          },
+          "DATABASE_URL": {
+            "description": "Private PostgreSQL connection for workspace state.",
+            "defaultValue": "${{Postgres.DATABASE_URL}}"
+          },
+          "WORKER_TOKEN": {
+            "description": "Shared authentication for the private browser worker.",
+            "defaultValue": "${{Browser.WORKER_TOKEN}}"
+          },
+          "AGENT_BACKEND": {
+            "description": "Agent harness: model for built-in provider, or agui with AGENT_URL.",
+            "defaultValue": "model"
+          },
+          "GOOGLE_API_KEY": {
+            "isOptional": true,
+            "description": "Optional Google provider key for google/ models.",
+            "defaultValue": ""
+          },
+          "OPENAI_API_KEY": {
+            "isOptional": true,
+            "description": "Optional OpenAI or OpenAI-compatible provider key. Required when MODEL uses openai/.",
+            "defaultValue": ""
+          },
+          "PUBLIC_API_URL": {
+            "description": "Public origin for web client, OAuth callbacks and signed file links.",
+            "defaultValue": "https://${{RAILWAY_PUBLIC_DOMAIN}}"
+          },
+          "WORKSPACE_MODE": {
+            "description": "Live persistent workspace. Sample mode is not for public hosting.",
+            "defaultValue": "live"
+          },
+          "OPENAI_BASE_URL": {
+            "isOptional": true,
+            "description": "Optional OpenAI-compatible API base URL. Leave blank for OpenAI.",
+            "defaultValue": ""
+          },
+          "RAILWAY_RUN_UID": {
+            "description": "Entrypoint repairs volume ownership, then drops to the unprivileged node user.",
+            "defaultValue": "0"
+          },
+          "COMPUTER_ENABLED": {
+            "description": "Linux desktop requires a Docker host and is unavailable on Railway. Browser automation remains enabled.",
+            "defaultValue": "false"
+          },
+          "GOOGLE_CLIENT_ID": {
+            "isOptional": true,
+            "description": "Optional Google OAuth web-client ID for Gmail and Calendar. See overview for consent setup.",
+            "defaultValue": ""
+          },
+          "ANTHROPIC_API_KEY": {
+            "isOptional": true,
+            "description": "Optional Anthropic provider key for anthropic/ models.",
+            "defaultValue": ""
+          },
+          "BROWSER_WORKER_URL": {
+            "description": "Private browser-worker endpoint.",
+            "defaultValue": "http://${{Browser.RAILWAY_PRIVATE_DOMAIN}}:8790"
+          },
+          "OPENMUSE_ACCESS_KEY": {
+            "description": "Generated workspace sign-in key. Copy this value from Variables to log in; keep it private.",
+            "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\") }}"
+          },
+          "TASK_WORKER_ENABLED": {
+            "description": "Run durable background tasks in the API service.",
+            "defaultValue": "true"
+          },
+          "GOOGLE_CLIENT_SECRET": {
+            "isOptional": true,
+            "description": "Optional Google OAuth client secret; configure with GOOGLE_CLIENT_ID.",
+            "defaultValue": ""
+          },
+          "TOKEN_ENCRYPTION_KEY": {
+            "description": "Generated canonical base64 encryption key, exactly 32 bytes. Keep unchanged after connecting accounts.",
+            "defaultValue": "${{ secret(42, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/\") }}${{ secret(1, \"AEIMQUYcgkosw048\") }}="
+          },
+          "CPK_INTELLIGENCE_API_KEY": {
+            "description": "Required CopilotKit Intelligence project key for durable conversations. Create a free project at platform.copilotkit.ai or run npx copilotkit@latest login and project select.",
+            "defaultValue": ""
+          }
+        },
+        "networking": {
+          "serviceDomains": {
+            "<hasDomain>:8080": {
+              "port": 8080
+            }
+          }
+        },
+        "volumeMounts": {
+          "83577d9d-cc86-4593-a270-210beed2dd43": {
+            "mountPath": "/data"
+          }
+        }
+      },
+      "9e6989a4-aee5-44df-8f24-0b1d9c0f963a": {
+        "icon": "https://bogusz.co/external/openmuse-icon.png",
+        "name": "Browser",
+        "deploy": {
+          "startCommand": "sh -c 'chown pwuser:pwuser /data && exec setpriv --reuid=pwuser --regid=pwuser --init-groups node --experimental-strip-types src/index.ts'",
+          "healthcheckPath": "/health"
+        },
+        "source": {
+          "image": "ghcr.io/will-bogusz/openmuse-browser-worker:fed01e9-20260922@sha256:f6c625b5bffc5c65c912ed4b128a1e8ac2323107b8ab153d4cde05cad5549cf6"
+        },
+        "variables": {
+          "PORT": {
+            "description": "Browser worker port and Railway healthcheck port.",
+            "defaultValue": "8790"
+          },
+          "WORKER_HOST": {
+            "description": "Listen on the private network.",
+            "defaultValue": "0.0.0.0"
+          },
+          "WORKER_TOKEN": {
+            "description": "Generated private authentication token shared with OpenMuse.",
+            "defaultValue": "${{ secret(48, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\") }}"
+          },
+          "RAILWAY_RUN_UID": {
+            "description": "Start as root only to repair the volume, then drop to pwuser.",
+            "defaultValue": "0"
+          },
+          "WORKER_DATA_DIR": {
+            "description": "Persistent isolated Chromium profiles.",
+            "defaultValue": "/data"
+          }
+        },
+        "volumeMounts": {
+          "9e6989a4-aee5-44df-8f24-0b1d9c0f963a": {
+            "mountPath": "/data"
+          }
+        }
+      },
+      "fe8b6a55-8e41-4732-906e-f3f00a24eaaa": {
+        "icon": "https://devicons.railway.app/i/postgresql.svg",
+        "name": "Postgres",
+        "source": {
+          "image": "ghcr.io/railwayapp-templates/postgres-ssl:18"
+        },
+        "variables": {
+          "PGDATA": {
+            "description": "Location where the database will be initialized",
+            "defaultValue": "/var/lib/postgresql/data/pgdata"
+          },
+          "PGHOST": {
+            "description": "Railway Private Domain Name.",
+            "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}"
+          },
+          "PGPORT": {
+            "description": "Port to connect to Postgres.",
+            "defaultValue": "5432"
+          },
+          "PGUSER": {
+            "description": "Required variable for Data panel",
+            "defaultValue": "${{ POSTGRES_USER }}"
+          },
+          "PGDATABASE": {
+            "description": "Required variable for the data panel.",
+            "defaultValue": "${{POSTGRES_DB}}"
+          },
+          "PGPASSWORD": {
+            "description": "Required variable for Data panel",
+            "defaultValue": "${{POSTGRES_PASSWORD}}"
+          },
+          "POSTGRES_DB": {
+            "description": "Default database created when image is started.",
+            "defaultValue": "railway"
+          },
+          "DATABASE_URL": {
+            "description": "URL to connect to Postgres database.",
+            "defaultValue": "postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}"
+          },
+          "POSTGRES_USER": {
+            "description": "User to connect to Postgres DB",
+            "defaultValue": "postgres"
+          },
+          "SSL_CERT_DAYS": {
+            "isOptional": true,
+            "description": "SSL certificate expiry in days.",
+            "defaultValue": "820"
+          },
+          "POSTGRES_PASSWORD": {
+            "description": "Password to connect to DB",
+            "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}"
+          },
+          "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+            "description": "Allow Postgres to cleanly shut down",
+            "defaultValue": "60"
+          }
+        },
+        "volumeMounts": {
+          "fe8b6a55-8e41-4732-906e-f3f00a24eaaa": {
+            "mountPath": "/var/lib/postgresql/data"
+          }
+        }
+      }
+    }
+  }
+}

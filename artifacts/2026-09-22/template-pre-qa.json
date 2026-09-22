@@ -1,0 +1,234 @@
+{
+  "buckets": {},
+  "services": {
+    "83577d9d-cc86-4593-a270-210beed2dd43": {
+      "icon": "https://bogusz.co/external/openmuse-icon.png",
+      "name": "OpenMuse",
+      "deploy": {
+        "startCommand": null,
+        "healthcheckPath": "/api/health",
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "image": "ghcr.io/will-bogusz/openmuse:fed01e9-20260922@sha256:67063ca1a871c563332525699e9da80618e7acbe00de35a0bf755bdd0d3a6a73"
+      },
+      "variables": {
+        "PORT": {
+          "description": "Public web and API proxy port.",
+          "defaultValue": "8080"
+        },
+        "MODEL": {
+          "isOptional": true,
+          "description": "Optional model, e.g. openai/gpt-5.6-terra, anthropic/claude-sonnet-4-6 or google/gemini-2.5-flash. Set the matching provider key. Blank starts the workspace without model chat.",
+          "defaultValue": ""
+        },
+        "DATA_DIR": {
+          "description": "Persistent documents and workspace signing key. Do not change without migrating the volume.",
+          "defaultValue": "/data"
+        },
+        "AGENT_URL": {
+          "isOptional": true,
+          "description": "Optional remote AG-UI agent endpoint. Set AGENT_BACKEND=agui to use your own harness.",
+          "defaultValue": ""
+        },
+        "AGENT_TOKEN": {
+          "isOptional": true,
+          "description": "Optional bearer token for AGENT_URL.",
+          "defaultValue": ""
+        },
+        "DATABASE_URL": {
+          "description": "Private PostgreSQL connection for workspace state.",
+          "defaultValue": "${{Postgres.DATABASE_URL}}"
+        },
+        "WORKER_TOKEN": {
+          "description": "Shared authentication for the private browser worker.",
+          "defaultValue": "${{Browser.WORKER_TOKEN}}"
+        },
+        "AGENT_BACKEND": {
+          "description": "Agent harness: model for built-in provider, or agui with AGENT_URL.",
+          "defaultValue": "model"
+        },
+        "GOOGLE_API_KEY": {
+          "isOptional": true,
+          "description": "Optional Google provider key for google/ models.",
+          "defaultValue": ""
+        },
+        "OPENAI_API_KEY": {
+          "isOptional": true,
+          "description": "Optional OpenAI or OpenAI-compatible provider key. Required when MODEL uses openai/.",
+          "defaultValue": ""
+        },
+        "PUBLIC_API_URL": {
+          "description": "Public origin for web client, OAuth callbacks and signed file links.",
+          "defaultValue": "https://${{RAILWAY_PUBLIC_DOMAIN}}"
+        },
+        "WORKSPACE_MODE": {
+          "description": "Live persistent workspace. Sample mode is not for public hosting.",
+          "defaultValue": "live"
+        },
+        "OPENAI_BASE_URL": {
+          "isOptional": true,
+          "description": "Optional OpenAI-compatible API base URL. Leave blank for OpenAI.",
+          "defaultValue": ""
+        },
+        "RAILWAY_RUN_UID": {
+          "description": "Entrypoint repairs volume ownership, then drops to the unprivileged node user.",
+          "defaultValue": "0"
+        },
+        "COMPUTER_ENABLED": {
+          "description": "Linux desktop requires a Docker host and is unavailable on Railway. Browser automation remains enabled.",
+          "defaultValue": "false"
+        },
+        "GOOGLE_CLIENT_ID": {
+          "isOptional": true,
+          "description": "Optional Google OAuth web-client ID for Gmail and Calendar. See overview for consent setup.",
+          "defaultValue": ""
+        },
+        "ANTHROPIC_API_KEY": {
+          "isOptional": true,
+          "description": "Optional Anthropic provider key for anthropic/ models.",
+          "defaultValue": ""
+        },
+        "BROWSER_WORKER_URL": {
+          "description": "Private browser-worker endpoint.",
+          "defaultValue": "http://${{Browser.RAILWAY_PRIVATE_DOMAIN}}:8790"
+        },
+        "OPENMUSE_ACCESS_KEY": {
+          "description": "Generated workspace sign-in key. Copy this value from Variables to log in; keep it private.",
+          "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\") }}"
+        },
+        "TASK_WORKER_ENABLED": {
+          "description": "Run durable background tasks in the API service.",
+          "defaultValue": "true"
+        },
+        "GOOGLE_CLIENT_SECRET": {
+          "isOptional": true,
+          "description": "Optional Google OAuth client secret; configure with GOOGLE_CLIENT_ID.",
+          "defaultValue": ""
+        },
+        "TOKEN_ENCRYPTION_KEY": {
+          "description": "Generated canonical base64 encryption key, exactly 32 bytes. Keep unchanged after connecting accounts.",
+          "defaultValue": "${{ secret(42, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/\") }}${{ secret(1, \"AEIMQUYcgkosw048\") }}="
+        },
+        "CPK_INTELLIGENCE_API_KEY": {
+          "description": "Required CopilotKit Intelligence project key for durable conversations. Create a free project at platform.copilotkit.ai or run npx copilotkit@latest login and project select.",
+          "defaultValue": ""
+        }
+      },
+      "networking": {
+        "serviceDomains": {
+          "<hasDomain>:8080": {
+            "port": 8080
+          }
+        }
+      },
+      "volumeMounts": {
+        "83577d9d-cc86-4593-a270-210beed2dd43": {
+          "mountPath": "/data"
+        }
+      }
+    },
+    "9e6989a4-aee5-44df-8f24-0b1d9c0f963a": {
+      "icon": "https://bogusz.co/external/openmuse-icon.png",
+      "name": "Browser",
+      "deploy": {
+        "startCommand": "sh -c 'chown pwuser:pwuser /data && exec setpriv --reuid=pwuser --regid=pwuser --init-groups node --experimental-strip-types src/index.ts'",
+        "healthcheckPath": "/health"
+      },
+      "source": {
+        "image": "ghcr.io/will-bogusz/openmuse-browser-worker:fed01e9-20260922@sha256:f6c625b5bffc5c65c912ed4b128a1e8ac2323107b8ab153d4cde05cad5549cf6"
+      },
+      "variables": {
+        "PORT": {
+          "description": "Browser worker port and Railway healthcheck port.",
+          "defaultValue": "8790"
+        },
+        "WORKER_HOST": {
+          "description": "Listen on the private network.",
+          "defaultValue": "0.0.0.0"
+        },
+        "WORKER_TOKEN": {
+          "description": "Generated private authentication token shared with OpenMuse.",
+          "defaultValue": "${{ secret(48, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\") }}"
+        },
+        "RAILWAY_RUN_UID": {
+          "description": "Start as root only to repair the volume, then drop to pwuser.",
+          "defaultValue": "0"
+        },
+        "WORKER_DATA_DIR": {
+          "description": "Persistent isolated Chromium profiles.",
+          "defaultValue": "/data"
+        }
+      },
+      "volumeMounts": {
+        "9e6989a4-aee5-44df-8f24-0b1d9c0f963a": {
+          "mountPath": "/data"
+        }
+      }
+    },
+    "fe8b6a55-8e41-4732-906e-f3f00a24eaaa": {
+      "icon": "https://devicons.railway.app/i/postgresql.svg",
+      "name": "Postgres",
+      "source": {
+        "image": "ghcr.io/railwayapp-templates/postgres-ssl:18"
+      },
+      "variables": {
+        "PGDATA": {
+          "description": "Location where the database will be initialized",
+          "defaultValue": "/var/lib/postgresql/data/pgdata"
+        },
+        "PGHOST": {
+          "description": "Railway Private Domain Name.",
+          "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}"
+        },
+        "PGPORT": {
+          "description": "Port to connect to Postgres.",
+          "defaultValue": "5432"
+        },
+        "PGUSER": {
+          "description": "Required variable for Data panel",
+          "defaultValue": "${{ POSTGRES_USER }}"
+        },
+        "PGDATABASE": {
+          "description": "Required variable for the data panel.",
+          "defaultValue": "${{POSTGRES_DB}}"
+        },
+        "PGPASSWORD": {
+          "description": "Required variable for Data panel",
+          "defaultValue": "${{POSTGRES_PASSWORD}}"
+        },
+        "POSTGRES_DB": {
+          "description": "Default database created when image is started.",
+          "defaultValue": "railway"
+        },
+        "DATABASE_URL": {
+          "description": "URL to connect to Postgres database.",
+          "defaultValue": "postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}"
+        },
+        "POSTGRES_USER": {
+          "description": "User to connect to Postgres DB",
+          "defaultValue": "postgres"
+        },
+        "SSL_CERT_DAYS": {
+          "isOptional": true,
+          "description": "SSL certificate expiry in days.",
+          "defaultValue": "820"
+        },
+        "POSTGRES_PASSWORD": {
+          "description": "Password to connect to DB",
+          "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}"
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "description": "Allow Postgres to cleanly shut down",
+          "defaultValue": "60"
+        }
+      },
+      "volumeMounts": {
+        "fe8b6a55-8e41-4732-906e-f3f00a24eaaa": {
+          "mountPath": "/var/lib/postgresql/data"
+        }
+      }
+    }
+  }
+}

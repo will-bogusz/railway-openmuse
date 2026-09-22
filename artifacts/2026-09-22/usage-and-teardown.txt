@@ -1,0 +1,15 @@
+Captured 2026-09-22 immediately before final QA teardown. Usage metering can lag approximately seven minutes. The script's usage-based monthly averages mix startup, QA and idle time; use footprint.txt for the separately sampled quiet-idle estimate. Its traffic factor is a kit heuristic, not measured OpenMuse traffic.
+
+  Postgres idle=0.069GB 0.0024vCPU disk=0.220GB $0.78/mo spent=$0.0004
+  Browser idle=0.133GB 0.0019vCPU disk=0.091GB $1.38/mo spent=$0.0007
+  OpenMuse idle=0.127GB 0.0061vCPU disk=0.084GB $1.41/mo spent=$0.0009
+  total=3.57/mo idle, 4.57/mo with measured 1.28 traffic premium; creator=1.14/mo; run_spent=0.0020
+RESULT usage PASS services=3 monthly_usd=3.57 traffic_usd=4.57 creator_usd=1.14 spent_usd=0.0020
+2026-09-22T22:50:32Z deleting throwaway project=c8b2561b-b226-4781-9e73-460c892da9b1 and verifying deletedAt through the owner API
+  deletedAt=2026-09-24T22:50:34.604Z
+RESULT teardown PASS project=c8b2561b-b226-4781-9e73-460c892da9b1 deletedAt=2026-09-24T22:50:34.604Z
+
+The deletedAt value is Railway's scheduled purge time, not another 48 hours of active service billing. The template-build project was also deleted earlier:
+RESULT teardown PASS project=1c4630c9-333f-4ff6-b979-7921e7da2b66 deletedAt=2026-09-24T22:43:04.194Z
+
+Local goliath lab containers om-app/om-worker/om-pg, volumes om-data/om-worker/om-pg plus the inspected anonymous Postgres volume, and network om-net were removed. Pulled image caches and source checkouts were retained.
