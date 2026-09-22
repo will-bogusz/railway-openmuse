@@ -1,0 +1,30 @@
+{
+	admin off
+	auto_https off
+	persist_config off
+	storage file_system /tmp/caddy
+	log {
+		level WARN
+	}
+}
+
+:{$OPENMUSE_PUBLIC_PORT} {
+	encode zstd gzip
+
+	# The API, including the CopilotKit runtime's streamed AG-UI responses.
+	handle /api/* {
+		reverse_proxy 127.0.0.1:{$OPENMUSE_API_PORT} {
+			flush_interval -1
+		}
+	}
+
+	# The exported web client (a single-page app).
+	handle {
+		root * /srv/web
+		@static path /_expo/* /assets/*
+		header @static Cache-Control "public, max-age=31536000, immutable"
+		header /index.html Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+}
