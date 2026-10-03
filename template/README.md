@@ -31,7 +31,7 @@ The API and browser worker drop root privileges before running. Only OpenMuse ha
 ## Dependencies for OpenMuse Hosting
 
 - OpenMuse source at commit `fed01e9d6411ab773d9adf1aa490a07dc8c64d0b` (MIT).
-- `ghcr.io/will-bogusz/openmuse:fed01e9-20260922`, pinned by digest: API, web client and Caddy.
+- `ghcr.io/will-bogusz/openmuse:fed01e9-20261003`, pinned by digest: API, web client and Caddy.
 - `ghcr.io/will-bogusz/openmuse-browser-worker:fed01e9-20260922`, pinned by digest: upstream browser-worker Dockerfile, unchanged.
 - Railway's PostgreSQL 18 image and three persistent volumes.
 - Your own CopilotKit Intelligence project key; a model and provider key for general-purpose AI work.

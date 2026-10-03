@@ -11,7 +11,7 @@
         "restartPolicyMaxRetries": 10
       },
       "source": {
-        "image": "ghcr.io/will-bogusz/openmuse:fed01e9-20260922@sha256:67063ca1a871c563332525699e9da80618e7acbe00de35a0bf755bdd0d3a6a73"
+        "image": "ghcr.io/will-bogusz/openmuse:fed01e9-20261003@sha256:46323e298ee48a3ad0e4d19fbd3df0e5aeee2c3d3f5b36737178f0da64ce586a"
       },
       "variables": {
         "PORT": {
