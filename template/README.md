@@ -4,6 +4,8 @@ OpenMuse is CopilotKit's open-source personal assistant: chat, a persistent brow
 
 **Runs on every plan, Hobby recommended for real use.** The three services idle at about 350 MB together (measured ≈ $3.50 a month), within the Free plan's 0.5 GB per-service limit; browsing heavy sites raises the Browser service's memory, and Free and Trial volumes hold only 0.5 GB.
 
+**First use, in three steps.** (1) Deploy with your CopilotKit key. (2) Choose a model: in OpenMuse's Variables set `MODEL` and the matching key (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY` or `GOOGLE_API_KEY`; add `OPENAI_BASE_URL` for an OpenAI-compatible provider), then deploy the change. Example with OpenRouter: `MODEL=openai/openai/gpt-4o-mini`, `OPENAI_API_KEY=<your OpenRouter key>`, `OPENAI_BASE_URL=https://openrouter.ai/api/v1`. (3) Open the public domain and sign in with `OPENMUSE_ACCESS_KEY` from the Variables tab. If chat shows "Runtime info request failed with status 503", no model is configured yet.
+
 **This is an alpha for self-hosters and tinkerers, not a managed assistant.** Bring your own model provider, review agent actions, and expect upstream behavior to change. The optional Docker-based Linux desktop/terminal is not included; Railway cannot provide the Docker engine it needs. Browser automation works without it.
 
 ## About Hosting OpenMuse

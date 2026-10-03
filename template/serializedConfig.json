@@ -68,7 +68,7 @@
         },
         "MODEL": {
           "isOptional": true,
-          "description": "Optional model, e.g. openai/gpt-5.6-terra, anthropic/claude-sonnet-4-6 or google/gemini-2.5-flash. Set the matching provider key. Blank starts the workspace without model chat.",
+          "description": "Model for chat, as provider/model-id, e.g. openai/gpt-5.6-terra, anthropic/claude-sonnet-4-6 or google/gemini-2.5-flash; set the matching provider key too. Blank boots the workspace, but chat shows \"Runtime info request failed with status 503\" until a model is set.",
           "defaultValue": ""
         },
         "OPENAI_API_KEY": {
