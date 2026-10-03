@@ -1,0 +1,15 @@
+20:51:34
+1 ppid=0 start_ticks=260605918 bash -c run 
+14 ppid=1 start_ticks=260605934 node dist/apps/server/src/index.js 
+15 ppid=1 start_ticks=260605934 caddy run --config /etc/caddy/Caddyfile --adapter caddyfile 
+50 ppid=47 start_ticks=260639411 sort -n 
+uptime_s=2606394.13
+health via caddy: 200
+== kill -9 caddy 15
+20:51:57
+1 ppid=0 start_ticks=260639497 bash -c run 
+13 ppid=1 start_ticks=260639512 node dist/apps/server/src/index.js 
+14 ppid=1 start_ticks=260639512 caddy run --config /etc/caddy/Caddyfile --adapter caddyfile 
+40 ppid=37 start_ticks=260641733 sort -n 
+uptime_s=2606417.34
+health via caddy: 200

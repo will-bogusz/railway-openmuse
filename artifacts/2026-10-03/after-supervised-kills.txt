@@ -1,0 +1,41 @@
+20:54:12
+1 ppid=0 start_ticks=260652148 bash -c run 
+13 ppid=1 start_ticks=260652156 bash -c run 
+14 ppid=1 start_ticks=260652156 bash -c run 
+15 ppid=13 start_ticks=260652156 node dist/apps/server/src/index.js 
+16 ppid=14 start_ticks=260652156 caddy run --config /etc/caddy/Caddyfile --adapter caddyfile 
+44 ppid=41 start_ticks=260655201 sort -n 
+uptime_s=2606552.03
+health via caddy: 200
+== kill -9 caddy 16
+health via caddy: down ECONNREFUSED
+20:54:18
+1 ppid=0 start_ticks=260652148 bash -c run 
+13 ppid=1 start_ticks=260652156 bash -c run 
+14 ppid=1 start_ticks=260652156 bash -c run 
+15 ppid=13 start_ticks=260652156 node dist/apps/server/src/index.js 
+116 ppid=14 start_ticks=260655409 caddy run --config /etc/caddy/Caddyfile --adapter caddyfile 
+130 ppid=41 start_ticks=260655813 sort -n 
+uptime_s=2606558.15
+health via caddy: 200
+== kill -9 api 15
+health via caddy: 502
+20:54:24
+1 ppid=0 start_ticks=260652148 bash -c run 
+13 ppid=1 start_ticks=260652156 bash -c run 
+14 ppid=1 start_ticks=260652156 bash -c run 
+116 ppid=14 start_ticks=260655409 caddy run --config /etc/caddy/Caddyfile --adapter caddyfile 
+202 ppid=13 start_ticks=260656023 node dist/apps/server/src/index.js 
+216 ppid=41 start_ticks=260656427 sort -n 
+uptime_s=2606564.29
+health via caddy: 200
+== kill -9 api again 202
+20:54:32
+1 ppid=0 start_ticks=260652148 bash -c run 
+13 ppid=1 start_ticks=260652156 bash -c run 
+14 ppid=1 start_ticks=260652156 bash -c run 
+116 ppid=14 start_ticks=260655409 caddy run --config /etc/caddy/Caddyfile --adapter caddyfile 
+279 ppid=13 start_ticks=260656836 node dist/apps/server/src/index.js 
+293 ppid=41 start_ticks=260657235 sort -n 
+uptime_s=2606572.37
+health via caddy: 200

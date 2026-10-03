@@ -2,6 +2,8 @@
 
 OpenMuse is CopilotKit's open-source personal assistant: chat, a persistent browser, delegated tasks, goals, ideas and document workflows in a mobile-friendly web app. This template deploys the web app and API, a private Chromium browser worker, and PostgreSQL. Workspace data, documents and browser profiles survive redeploys. **One input is required:** your CopilotKit Intelligence project key. The workspace login key, encryption key, browser token and database password are generated for you.
 
+**Runs on every plan, Hobby recommended for real use.** The three services idle at about 350 MB together (measured ≈ $3.50 a month), within the Free plan's 0.5 GB per-service limit; browsing heavy sites raises the Browser service's memory, and Free and Trial volumes hold only 0.5 GB.
+
 **This is an alpha for self-hosters and tinkerers, not a managed assistant.** Bring your own model provider, review agent actions, and expect upstream behavior to change. The optional Docker-based Linux desktop/terminal is not included; Railway cannot provide the Docker engine it needs. Browser automation works without it.
 
 ## About Hosting OpenMuse
@@ -14,7 +16,7 @@ Three services make up this deployment:
 | Browser | Private Playwright Chromium worker, authenticated with a generated token | `/data`: browser profiles |
 | Postgres | Workspace records, tasks, goals, approvals and encrypted connector credentials | `/var/lib/postgresql/data` |
 
-Conversations use **CopilotKit Intelligence**, a separate hosted dependency. This is not a completely offline or entirely self-contained deployment. Create a free Developer project at [CopilotKit Intelligence](https://platform.copilotkit.ai), or run `npx copilotkit@latest login` followed by `npx copilotkit@latest project select`. Put its server-only key in `CPK_INTELLIGENCE_API_KEY`. CopilotKit plan limits and retention apply; model-provider usage is separate.
+Conversations use **CopilotKit Intelligence**, a separate hosted dependency. This is not a completely offline or entirely self-contained deployment. Sign up free at [CopilotKit Intelligence](https://dashboard.operations.copilotkit.ai), then create a Developer project with the CopilotKit CLI: in an empty folder run `npx copilotkit@latest login`, then `npx copilotkit@latest project select --create openmuse`; the key is written to `.env` as `CPK_INTELLIGENCE_API_KEY`. Put that server-only key in `CPK_INTELLIGENCE_API_KEY`. CopilotKit plan limits and retention apply; model-provider usage is separate.
 
 The API and browser worker drop root privileges before running. Only OpenMuse has a public domain. PostgreSQL and the browser communicate over Railway's private network.
 
@@ -64,7 +66,7 @@ For example, OpenRouter was exercised with `MODEL=openai/openai/gpt-4o-mini` and
 
 **Persistence and backups.** Keep `TOKEN_ENCRYPTION_KEY` unchanged and backed up with PostgreSQL; rotating it makes stored connector credentials unreadable. Keep the OpenMuse volume for documents and session signing, and the Browser volume for profiles. Back up all three volumes before upgrading. CopilotKit conversation retention is independent of these backups. Deleting a service or its volume is not the same as redeploying it.
 
-**Health and redeploys.** `/api/health` is an unauthenticated, inexpensive process/configuration check, not a model, browser or database round-trip. The private browser uses `/health`. Volume-attached services cannot overlap their old and new deployments, so expect a short interruption during redeploys. Do not treat a green healthcheck as proof that a connector or model provider is configured.
+**Health and redeploys.** `/api/health` is an unauthenticated, inexpensive process/configuration check, not a model, browser or database round-trip. The private browser uses `/health`. Inside the OpenMuse container the API and Caddy are each restarted on their own with backoff if they exit, so a crash does not restart the container; look for `openmuse: api exited` or `openmuse: web exited` in the deploy logs. Volume-attached services cannot overlap their old and new deployments, so expect a short interruption during redeploys. Do not treat a green healthcheck as proof that a connector or model provider is configured.
 
 **Alpha limitations.** A delegated model task can stop in Waiting input without calling its completion tool. Read its timeline and provide a continuation if appropriate; a queued task is not proof of completion. General chat, real browser reads and a continued task producing a sourced report were exercised. Connected-account actions, external harnesses and the Docker computer were not exercised. Browser automation may encounter captchas or site restrictions; complete those yourself rather than trying to bypass them.
 

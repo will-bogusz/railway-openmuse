@@ -48,8 +48,9 @@ writes `PUBLIC_API_URL` into the bundle on every boot.
 
 Image defaults: `WORKSPACE_MODE=live`, `AGENT_BACKEND=model`, `TASK_WORKER_ENABLED=true`,
 `COMPUTER_ENABLED=false` (the optional Linux terminal needs a Docker engine). The entrypoint runs as
-root only to take ownership of `DATA_DIR`, then runs Caddy and the API as `node`; it exits when
-either exits. Healthcheck: `GET /api/health`.
+root only to take ownership of `DATA_DIR`, then runs Caddy and the API as `node`, restarting either
+one in place with backoff (2 s doubling to 60 s) when it exits; the container itself exits only on
+`SIGTERM`. Healthcheck: `GET /api/health`.
 
 The browser worker listens on 8790, reads `WORKER_TOKEN` and keeps profiles in `/data`. It runs as
 `pwuser`; on a root-owned volume start it as root with

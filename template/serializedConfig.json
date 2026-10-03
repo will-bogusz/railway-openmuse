@@ -47,7 +47,7 @@
           "defaultValue": "${{Postgres.DATABASE_URL}}"
         },
         "CPK_INTELLIGENCE_API_KEY": {
-          "description": "Required CopilotKit Intelligence project key for durable conversations. Create a free project at platform.copilotkit.ai or run npx copilotkit@latest login and project select.",
+          "description": "Required. CopilotKit Intelligence project key (starts with cpk-). Sign up free at dashboard.operations.copilotkit.ai, then in an empty folder run npx copilotkit@latest login and npx copilotkit@latest project select --create openmuse; the key is written to .env as CPK_INTELLIGENCE_API_KEY.",
           "defaultValue": ""
         },
         "OPENMUSE_ACCESS_KEY": {

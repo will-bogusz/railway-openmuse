@@ -1,7 +1,9 @@
 #!/bin/bash
 # Boot: own the data volume, point the web client at this deployment's URL,
 # then run the API (loopback) and Caddy (public port) as the unprivileged
-# `node` user. Exits when either process exits so the platform restarts it.
+# `node` user. Each is restarted in-container with backoff when it exits: every
+# container exit spends one of the platform's limited restarts, and once those
+# are gone the service stays down.
 set -euo pipefail
 
 fail() { echo "openmuse: $*" >&2; sleep 3; exit 1; }
@@ -33,22 +35,39 @@ grep -rlZ __OPENMUSE_PUBLIC_URL__ /srv/web | xargs -0 -r sed -i "s#__OPENMUSE_PU
 export OPENMUSE_PUBLIC_PORT="$PUBLIC_PORT" OPENMUSE_API_PORT="$API_PORT"
 export HOME=/home/node XDG_CONFIG_HOME=/tmp XDG_DATA_HOME=/tmp
 
+# Run one process forever: restart it with backoff (2 s doubling to 60 s,
+# reset after 5 minutes up) whenever it exits. TERM stops the child and returns.
+supervise() {
+	local name=$1 delay=2 started code child
+	shift
+	trap 'kill -TERM "$child" 2>/dev/null; wait "$child"; exit 0' TERM
+	while :; do
+		started=$SECONDS
+		"$@" &
+		child=$!
+		wait "$child"
+		code=$?
+		[ $((SECONDS - started)) -gt 300 ] && delay=2
+		echo "openmuse: $name exited with code $code; restarting it in ${delay}s" >&2
+		sleep "$delay" &
+		wait $!
+		delay=$((delay * 2))
+		[ "$delay" -gt 60 ] && delay=60
+	done
+}
+
 run() {
 	cd /app
-	PORT="$API_PORT" HOST=127.0.0.1 node dist/apps/server/src/index.js &
-	local api=$!
-	caddy run --config /etc/caddy/Caddyfile --adapter caddyfile &
-	local web=$!
-	trap 'kill -TERM "$api" "$web" 2>/dev/null' TERM INT
-	echo "openmuse: web client and API on :$PUBLIC_PORT, public URL $PUBLIC_URL"
 	set +e
-	wait -n "$api" "$web"
-	local code=$?
-	kill -TERM "$api" "$web" 2>/dev/null
+	supervise api env PORT="$API_PORT" HOST=127.0.0.1 node dist/apps/server/src/index.js &
+	local api=$!
+	supervise web caddy run --config /etc/caddy/Caddyfile --adapter caddyfile &
+	local web=$!
+	trap 'kill -TERM "$api" "$web" 2>/dev/null; wait; exit 0' TERM INT
+	echo "openmuse: web client and API on :$PUBLIC_PORT, public URL $PUBLIC_URL"
 	wait
-	exit "$code"
 }
-export -f run fail
+export -f run supervise fail
 export PUBLIC_URL PUBLIC_PORT API_PORT
 
 if [ "$(id -u)" = 0 ]; then
