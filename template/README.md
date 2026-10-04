@@ -20,7 +20,7 @@ OpenMuse is CopilotKit's open-source personal assistant: chat, a persistent brow
 | Browser | Private Playwright Chromium worker, authenticated with a generated token | `/data`: browser profiles |
 | Postgres | Workspace records, tasks, goals, approvals and encrypted connector credentials | `/var/lib/postgresql/data` |
 
-Conversations use **CopilotKit Intelligence**, a separate hosted dependency. This is not a completely offline or entirely self-contained deployment. Sign up free at [CopilotKit Intelligence](https://dashboard.operations.copilotkit.ai), then create a Developer project with the CopilotKit CLI: in an empty folder run `npx copilotkit@latest login`, then `npx copilotkit@latest project select --create openmuse`; the key is written to `.env` as `CPK_INTELLIGENCE_API_KEY`. Put that server-only key in `CPK_INTELLIGENCE_API_KEY`. CopilotKit plan limits and retention apply; model-provider usage is separate.
+Conversations use **CopilotKit Intelligence**, a separate hosted dependency. This is not a completely offline or entirely self-contained deployment. Step 1 above creates a free Developer project with the CopilotKit CLI and writes its server-only key to `.env` as `CPK_INTELLIGENCE_API_KEY`; that value goes into the variable of the same name. CopilotKit plan limits and retention apply; model-provider usage is separate.
 
 The API and browser worker drop root privileges before running. Only OpenMuse has a public domain. PostgreSQL and the browser communicate over Railway's private network.
 
