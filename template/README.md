@@ -1,16 +1,18 @@
 # Deploy and Host OpenMuse with Railway
 
-OpenMuse is CopilotKit's open-source personal assistant: chat, a persistent browser, delegated tasks, goals, ideas and document workflows in a mobile-friendly web app. This template deploys the web app and API, a private Chromium browser worker, and PostgreSQL. Workspace data, documents and browser profiles survive redeploys. **One input is required:** your CopilotKit Intelligence project key. The workspace login key, encryption key, browser token and database password are generated for you.
+![OpenMuse on desktop and phone: its browser reads the CopilotKit docs and answers in chat, next to a task it created](https://bogusz.co/external/openmuse-banner-v1.png)
 
-**Runs on every plan, Hobby recommended for real use.** The three services idle at about 350 MB together (measured ≈ $3.50 a month), within the Free plan's 0.5 GB per-service limit; browsing heavy sites raises the Browser service's memory, and Free and Trial volumes hold only 0.5 GB.
+CopilotKit's open-source personal agent, with its own browser, documents, tasks and goals, in a web app that works on your phone.
 
-**First use, in three steps.** (1) Deploy with your CopilotKit key. (2) Choose a model: in OpenMuse's Variables set `MODEL` and the matching key (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY` or `GOOGLE_API_KEY`; add `OPENAI_BASE_URL` for an OpenAI-compatible provider), then deploy the change. Example with OpenRouter: `MODEL=openai/openai/gpt-4o-mini`, `OPENAI_API_KEY=<your OpenRouter key>`, `OPENAI_BASE_URL=https://openrouter.ai/api/v1`. (3) Open the public domain and sign in with `OPENMUSE_ACCESS_KEY` from the Variables tab. If chat shows "Runtime info request failed with status 503", no model is configured yet.
+**Get started** — you need a free CopilotKit Intelligence key and a model provider key. Runs on every plan, Hobby recommended for real use: the three services idle at about 350 MB together (measured ≈ $3.50 a month).
 
-**This is an alpha for self-hosters and tinkerers, not a managed assistant.** Bring your own model provider, review agent actions, and expect upstream behavior to change. The optional Docker-based Linux desktop/terminal is not included; Railway cannot provide the Docker engine it needs. Browser automation works without it.
+1. **Get a CopilotKit key and deploy.** Sign up free at [CopilotKit Intelligence](https://dashboard.operations.copilotkit.ai); in an empty folder run `npx copilotkit@latest login`, then `npx copilotkit@latest project select --create openmuse`, and paste the `CPK_INTELLIGENCE_API_KEY` value from the `.env` it writes into the deploy form.
+2. **Choose a model.** In the OpenMuse service's **Variables** set `MODEL` and the matching key, then deploy the change. With OpenRouter: `MODEL=openai/openai/gpt-4o-mini`, `OPENAI_API_KEY` = your OpenRouter key, `OPENAI_BASE_URL=https://openrouter.ai/api/v1`.
+3. **Sign in and ask.** Open the OpenMuse service URL, paste `OPENMUSE_ACCESS_KEY` from its **Variables** tab, and ask it to summarize a web page.
 
 ## About Hosting OpenMuse
 
-Three services make up this deployment:
+OpenMuse is CopilotKit's open-source personal assistant: chat, a persistent browser, delegated tasks, goals, ideas and document workflows in a mobile-friendly web app. This template deploys the web app and API, a private Chromium browser worker, and PostgreSQL. Workspace data, documents and browser profiles survive redeploys. **One input is required:** your CopilotKit Intelligence project key. The workspace login key, encryption key, browser token and database password are generated for you. Three services make up this deployment:
 
 | Service | Purpose | Persistent storage |
 |---|---|---|
@@ -49,7 +51,11 @@ These are community-maintained images, not official CopilotKit images. [Build so
 
 ### Implementation Details
 
-**First login.** Wait for all three services to deploy, then open OpenMuse's public domain. Copy `OPENMUSE_ACCESS_KEY` from the OpenMuse service's Variables tab into the sign-in screen. Anyone with this key shares the same workspace; this is not a multi-tenant service. Do not put the key in a URL or share it publicly.
+**Plan requirements.** Runs on every plan, Hobby recommended for real use. The three services idle at about 350 MB together (measured ≈ $3.50 a month), within the Free plan's 0.5 GB per-service limit; browsing heavy sites raises the Browser service's memory, and Free and Trial volumes hold only 0.5 GB.
+
+**This is an alpha for self-hosters and tinkerers, not a managed assistant.** Bring your own model provider, review agent actions, and expect upstream behavior to change. The optional Docker-based Linux desktop/terminal is not included; Railway cannot provide the Docker engine it needs. Browser automation works without it.
+
+**First login.** Wait for all three services to deploy, then open OpenMuse's public domain. Copy `OPENMUSE_ACCESS_KEY` from the OpenMuse service's Variables tab into the sign-in screen. Anyone with this key shares the same workspace; this is not a multi-tenant service. Do not put the key in a URL or share it publicly. If chat shows "Runtime info request failed with status 503", no model is configured yet.
 
 **Configure a model.** The workspace can boot without one, but model chat and open-ended tasks need a provider. In OpenMuse's Variables, set `MODEL` to the provider/model identifier and set the matching key, then deploy the changes:
 
