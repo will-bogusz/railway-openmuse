@@ -4,7 +4,7 @@
 
 CopilotKit's open-source personal agent, with its own browser, documents, tasks and goals, in a web app that works on your phone.
 
-**Get started** — you need a free CopilotKit Intelligence key and a model provider key. Hobby recommended: the three services idle at about 350 MB when fresh and about 700 MB once the browser has been used (≈ $7 a month).
+**Get started** — you need a free CopilotKit Intelligence key and a model provider key. Hobby recommended: the three services idle at about 350 MB when fresh and about 700 MB once the browser has been used.
 
 1. **Get a CopilotKit key and deploy.** Sign up free at [CopilotKit Intelligence](https://dashboard.operations.copilotkit.ai); in an empty folder run `npx copilotkit@latest login`, then `npx copilotkit@latest project select --create openmuse`, and paste the `CPK_INTELLIGENCE_API_KEY` value from the `.env` it writes into the deploy form.
 2. **Choose a model.** In the OpenMuse service's **Variables** set `MODEL` and the matching key, then deploy the change. With OpenRouter: `MODEL=openai/openai/gpt-4o-mini`, `OPENAI_API_KEY` = your OpenRouter key, `OPENAI_BASE_URL=https://openrouter.ai/api/v1`.
@@ -51,7 +51,7 @@ These are community-maintained images, not official CopilotKit images. [Build so
 
 ### Implementation Details
 
-**Plan requirements.** Hobby recommended. Measured idle: about 350 MB across the three services on a fresh deploy (≈ $3.50 a month); after the browser has read a few pages it stays near 700 MB (OpenMuse 161 MB, Browser 463 MB, Postgres 72 MB; ≈ $7 a month, 2026-10-03). The Browser service then sits close to the Free plan's 0.5 GB per-service limit, and Free and Trial volumes hold only 0.5 GB.
+**Plan requirements.** Hobby recommended. Measured idle: about 350 MB across the three services on a fresh deploy; after the browser has read a few pages it stays near 700 MB (OpenMuse 161 MB, Browser 463 MB, Postgres 72 MB; 2026-10-03). The Browser service then sits close to the Free plan's 0.5 GB per-service limit, and Free and Trial volumes hold only 0.5 GB.
 
 **This is an alpha for self-hosters and tinkerers, not a managed assistant.** Bring your own model provider, review agent actions, and expect upstream behavior to change. The optional Docker-based Linux desktop/terminal is not included; Railway cannot provide the Docker engine it needs. Browser automation works without it.
 
