@@ -114,6 +114,11 @@
         "RAILWAY_RUN_UID": {
           "description": "Entrypoint repairs volume ownership, then drops to the unprivileged node user.",
           "defaultValue": "0"
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "defaultValue": "30",
+          "isOptional": false,
+          "description": "Seconds Railway waits after asking the container to stop before force-killing it, so restarts and redeploys shut down cleanly instead of being logged as crashes."
         }
       },
       "volumeMounts": {
@@ -160,6 +165,11 @@
         "RAILWAY_RUN_UID": {
           "description": "Start as root only to repair the volume, then drop to pwuser.",
           "defaultValue": "0"
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "defaultValue": "30",
+          "isOptional": false,
+          "description": "Seconds Railway waits after asking the container to stop before force-killing it, so restarts and redeploys shut down cleanly instead of being logged as crashes."
         }
       },
       "deploy": {
